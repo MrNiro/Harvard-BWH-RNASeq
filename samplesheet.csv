@@ -1,0 +1,4 @@
+sample,fastq_1,fastq_2,strandedness
+control_REP1,/home/ubuntu/data/1_S2_L001_R1_001.fastq.gz,/home/ubuntu/data/1_S2_L001_R2_001.fastq.gz,unstranded
+control_REP2,/home/ubuntu/data/2_S3_L001_R1_001.fastq.gz,/home/ubuntu/data/2_S3_L001_R2_001.fastq.gz,unstranded
+control_REP3,/home/ubuntu/data/3_S4_L001_R1_001.fastq.gz,/home/ubuntu/data/3_S4_L001_R2_001.fastq.gz,unstranded

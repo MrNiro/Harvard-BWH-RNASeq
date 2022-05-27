@@ -61,26 +61,49 @@ process TRIMGALORE {
         END_VERSIONS
         """
     } else {
-        """
-        [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
-        [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
-        trim_galore \\
-            $args \\
-            --cores $cores \\
-            --paired \\
-            --gzip \\
-            $c_r1 \\
-            $c_r2 \\
-            $tpc_r1 \\
-            $tpc_r2 \\
-            ${prefix}_1.fastq.gz \\
-            ${prefix}_2.fastq.gz
+        if (params.adapter_1 && params.adapter_2){
+            """
+            [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
+            [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
+            trim_galore \\
+                $args \\
+                --cores $cores \\
+                --paired \\
+                --gzip \\
+                -a ${params.adapter_1} \\
+                -a2 ${params.adapter_2} \\
+                ${prefix}_1.fastq.gz \\
+                ${prefix}_2.fastq.gz
 
-        cat <<-END_VERSIONS > versions.yml
-        "${task.process}":
-            trimgalore: \$(echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//')
-            cutadapt: \$(cutadapt --version)
-        END_VERSIONS
-        """
+            cat <<-END_VERSIONS > versions.yml
+            "${task.process}":
+                trimgalore: \$(echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//')
+                cutadapt: \$(cutadapt --version)
+            END_VERSIONS
+            """
+        } else{
+            """
+            [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
+            [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
+            trim_galore \\
+                $args \\
+                --cores $cores \\
+                --paired \\
+                --gzip \\
+                $c_r1 \\
+                $c_r2 \\
+                $tpc_r1 \\
+                $tpc_r2 \\
+                ${prefix}_1.fastq.gz \\
+                ${prefix}_2.fastq.gz
+
+            cat <<-END_VERSIONS > versions.yml
+            "${task.process}":
+                trimgalore: \$(echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//')
+                cutadapt: \$(cutadapt --version)
+            END_VERSIONS
+            """
+        }
+
     }
 }
