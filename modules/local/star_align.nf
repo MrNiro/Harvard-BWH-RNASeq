@@ -57,6 +57,7 @@ process STAR_ALIGN {
         --readFilesIn $reads  \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
+        --outFilterMultimapNmax 200 \\
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\
