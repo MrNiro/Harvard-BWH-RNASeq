@@ -15,7 +15,7 @@ if __name__ == '__main__':
         for idx, f_name in enumerate(filenames):
             sample = "control_REP%d," % (idx + 1)
             fastq = data_folder + f_name + ",,"
-            strandedness = "forward"
+            strandedness = "forward\n"
 
             line = sample + fastq + strandedness
             input_sample.write(line)
