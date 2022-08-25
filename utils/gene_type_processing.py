@@ -11,7 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 chrome_option = webdriver.ChromeOptions()
 chrome_option.add_argument(argument='--headless')
 browser = webdriver.Chrome(options=chrome_option)   # options=chrome_option
-wait = WebDriverWait(browser, 3)  # 最长等待时间为10S
+wait = WebDriverWait(browser, 3)  # 最长等待时间为3S
 # wait_v = WebDriverWait(browser, 20)
 browser.maximize_window()
 
@@ -22,9 +22,20 @@ def load_gene_type():
     for line in gene_name_type_file.readlines():
         info = line.split()[6:]
         g_name = info[0]
-        g_type = info[1]
+        g_type = info[1].lower()
+        g_name = g_name.lower()
         if g_name not in name_type:
             name_type[g_name] = g_type
+
+    gene_name_type_file = open("mapping_data/my_gene_type.txt")
+    for line in gene_name_type_file.readlines():
+        info = line.split()
+        g_name = info[0]
+        g_type = info[1]
+        g_name = g_name.lower()
+        if g_name not in name_type:
+            name_type[g_name] = g_type
+
     return name_type
 
 
@@ -61,7 +72,7 @@ def crawler(g_name):
                 g_type = temp
 
         except TimeoutException:
-            g_type = "unknow_type"
+            g_type = "unknown_type"
     print("\t\ttype: ", g_type)
     return g_type
 
@@ -86,12 +97,13 @@ def mapping():
         for line in tsv_file.readlines():
             info = line.split()
             g_name = info[1]
+            g_sum = sum(list(map(lambda x: float(x), info[2:])))
 
-            if float(info[-1]) > 0:
+            if g_sum > 0:
+                g_name = g_name.lower()
                 if g_name in name_type:
                     g_type = name_type[g_name]
                 else:
-                    g_name = g_name.lower()
                     if "trn" in g_name:
                         g_type = "tRNA"
                     elif "linc" in g_name:
@@ -104,6 +116,7 @@ def mapping():
                         g_type = crawler(g_name)
                         # g_type = "unknown_type"
 
+                info.append(str(g_sum))
                 info.append(g_type)
 
                 if g_type not in gene_type_count:
@@ -166,27 +179,20 @@ def mapping_tpm():
     print(len(my_genes))
 
 
-def plot_gene_count(mode="sum"):
+def plot_gene_count():
     """
         Available mode: sum, 1, 2, 3
     """
-    my_genes = load_mapped_genes()
+    # my_genes = load_mapped_genes()
+    my_genes, _ = mapping()
+
     gene_type_count = {}
     for each in my_genes[1:]:
-        if mode == "sum":
-            reads = float(each[-2])
-        elif mode == "1":
-            reads = float(each[-5])
-        elif mode == "2":
-            reads = float(each[-4])
-        elif mode == "3":
-            reads = float(each[-3])
-        else:
-            Exception("Unknown mode given")
-            return
+        reads = float(each[-2])
         if reads > 0:
             g_type = each[-1]
             if g_type not in gene_type_count:
+                # if g_type != "unknown_type":
                 gene_type_count[g_type] = 1
             else:
                 gene_type_count[g_type] += 1
@@ -197,12 +203,9 @@ def plot_gene_count(mode="sum"):
     to_plot.sort(key=lambda x: x[1], reverse=True)
 
     plot_num = 20
-    if mode == "sum":
-        plt.title("Expressed gene per type for all samples (extremely low reads are not listed)")
-    else:
-        plt.title("gene counts per type for sample %s (extremely low reads are not listed)" % mode)
+    plt.title("Expressed gene per type for all samples (extremely low reads are not listed)")
     plt.ylabel("gene types")
-    plt.xlabel("gene counts in 3 samples")
+    plt.xlabel("gene counts in all samples")
     # plt.bar(x=[x[0] for x in to_plot[:plot_num]], height=[x[1] for x in to_plot[:plot_num]])
     plt.barh(y=[x[0] for x in to_plot[:plot_num]], width=[x[1] for x in to_plot[:plot_num]])
     plt.show()
@@ -260,6 +263,6 @@ def plot_reads_count(mode="sum"):
 
 
 if __name__ == '__main__':
-    plot_gene_count(mode="sum")
-    plot_reads_count()
+    plot_gene_count()
+    # plot_reads_count()
     # mapping_tpm()
