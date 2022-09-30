@@ -7,3 +7,10 @@ testing/
 testing*
 *.pyc
 *.idea*
+*geckodriver*
+.Rproj.user
+utils/DE/*/*.csv
+utils/DE/*/*.pdf
+utils/DE/*/*.txt
+utils/DE/Old
+utils/DE/.*
